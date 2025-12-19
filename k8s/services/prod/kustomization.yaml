@@ -1,0 +1,12 @@
+resources:
+  - backend/deployment.yaml
+  - tasks/task-keys-healthcheck.yaml
+  - tasks/task-load-keys-traffic.yaml
+  - tasks/task-refresh-keys.yaml
+  - tasks/task-notify-about-key-expiration.yaml
+  - backend/service.yaml
+  - ingress/ingress.yaml
+  - static/deployment.yaml
+  - static/service.yaml
+  - static/config_map.yaml
+  - bot/deployment.yaml

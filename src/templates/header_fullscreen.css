@@ -1,0 +1,33 @@
+header {
+    height: max(var(--tg-content-safe-area-inset-top), 2em);
+    margin: 0 100px;
+    position: fixed;
+    padding: 0 10px;
+    top: var(--tg-safe-area-inset-top);
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+}
+
+header div {
+    background-color: rgba(0, 0, 0, .35);
+    padding: .25rem;
+    border-radius: 1rem;
+    padding-inline: .625rem;
+    height: 1.75rem;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+header * {
+    font-size: .875rem;
+    font-weight: var(--font-weight-medium);
+    color: white;
+}
+
+main {
+    margin-top: max(var(--tg-content-safe-area-inset-top), 2em);
+}

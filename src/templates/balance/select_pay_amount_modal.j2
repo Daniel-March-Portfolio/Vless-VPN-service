@@ -1,0 +1,44 @@
+<div class="modal" id="selectPayAmount">
+    <div class="modal_content">
+        <div class="section">
+            <small class="hint">TOP UP AMOUNT</small>
+            {% for amount in [100, 250, 500, 1000] %}
+            	<button class="button" onclick="selectPayAmount({{ amount }})">{{ amount }} ⭐</button>
+            {% endfor %}
+        </div>
+        <div class="section">
+            <button class="cancel_button" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+    <script>
+        async function selectPayAmount(amount) {
+            showLoading()
+            let response = await fetch(
+                `/api/balances/`,
+                {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        amount: amount,
+                        description: 'Balance top-up',
+                    })
+                }
+            )
+
+            if (!response.ok) {
+                hideLoading()
+                await tryHandleException(response)
+            } else {
+                hideLoading()
+                showAlert(
+                    'Top-up created successfully. Open bot to pay.',
+                    closeApp
+                )
+            }
+        }
+    </script>
+</div>

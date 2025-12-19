@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: task-load-keys-traffic
+  namespace: vpn-prod
+  labels:
+    app: task-load-keys-traffic
+spec:
+  revisionHistoryLimit: 2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: task-load-keys-traffic
+  template:
+    metadata:
+      labels:
+        app: task-load-keys-traffic
+    spec:
+      containers:
+      - name: task-load-keys-traffic
+        image: ghcr.io/kelvpn/vpn4-prod:latest
+        args: [ "load_keys_traffic" , "60" ]
+        env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+        envFrom:
+          - secretRef:
+              name: app-secrets-prod
+      imagePullSecrets:
+        - name: github-registry-secret

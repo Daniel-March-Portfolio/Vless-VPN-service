@@ -1,0 +1,60 @@
+{% extends 'base.j2' %}
+{% block head %}
+{% endblock %}
+{% block body %}
+    <main>
+        <div id="main_content">
+            <div class="section_wrapper">
+                <div class="section_header">
+                    <span class="hint">BALANCE TRANSACTIONS</span>
+                </div>
+                <div class="section">
+                    <div class="section_item accent_text" onclick="showModal('selectPayAmount')">
+                        <div class="section_item_action">
+                            {% include 'svg/add.svg' %}
+                        </div>
+                        <label class="accent_text">Top up</label>
+                    </div>
+                    {% set operations = user.balance_history.order_by('-created_at') %}
+                    {% if operations %}
+                        {% for operation in operations %}
+                            {% set is_positive = operation.amount >= 0 %}
+                            <div class="section_item">
+                                <div class="section_item_action {% if is_positive %}success_text{% else %}destructive_text{% endif %}">
+                                    {% if is_positive %}{% include 'svg/income_operation.svg' %}{% else %}{% include 'svg/outcome_operation.svg' %}{% endif %}
+                                </div>
+                                <div>
+                                    <div class="items_between">
+                                        <span class="text">{% if is_positive %}+{% endif %} {{ operation.amount }} ⭐</span>
+                                        <small class="hint">{{ operation.created_at.strftime('%d.%m.%Y') }}</small>
+                                    </div>
+                                    <div class="items_between">
+                                        <small class="hint">{{ operation.description }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if not loop.last %}
+                                <div class="separator"></div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="section_item">
+                            <div class="section_item_action text">{% include 'svg/info.svg' %}</div>
+                            <div class="text">No transactions found</div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="section_footer">
+                </div>
+            </div>
+
+            <div class="section_wrapper">
+                <button id="back-button" class="section cancel_button" onclick="location.href='/'">Go back</button>
+            </div>
+        </div>
+    </main>
+    {% include 'balance/select_pay_amount_modal.j2' %}
+{% endblock %}
+{% block scripts %}
+    {% include 'balance/scripts.j2' %}
+{% endblock %}

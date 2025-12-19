@@ -1,0 +1,14 @@
+header {
+    height: max(var(--tg-content-safe-area-inset-top), 2em);
+    padding: 0 calc(1em + 10px);
+    max-width: 30em;
+    margin: 0 auto;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+}
+
+header div{
+    margin-right: 0;
+    color: var(--text-color);
+}

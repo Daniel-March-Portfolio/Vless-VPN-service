@@ -1,0 +1,28 @@
+<div class="modal" id="changeKeyTariffModal">
+    <div class="modal_content">
+        <div class="section">
+            <small class="hint">NEW TARIFF</small>
+            <select class="input" aria-label="" id="changeKeyTariffModalTariffId">
+                {% for new_tariff in tariffs %}
+                    <option value="{{ new_tariff.id }}">{{ new_tariff.title }} - {{ new_tariff.price }} ⭐ - {{ new_tariff.traffic_display }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="section">
+            <button class="button" onclick="changeKeyTariffModal()">Change</button>
+            <button class="cancel_button" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+    <script>
+        function prepareChangeKeyTariffModal(oldTariffId) {
+            const selectElement = document.getElementById('changeKeyTariffModalTariffId');
+            selectElement.value = oldTariffId;
+        }
+    </script>
+    <script>
+        function changeKeyTariffModal() {
+            const selectElement = document.getElementById('changeKeyTariffModalTariffId');
+            setKeyField('{{ key.id }}', 'tariff', selectElement.value);
+        }
+    </script>
+</div>

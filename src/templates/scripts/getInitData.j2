@@ -1,0 +1,24 @@
+<script>
+    function getInitData() {
+        let data = null;
+        try {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
+                data = {source: 'webapp', initData: window.Telegram.WebApp.initData};
+            }
+        } catch (e) {
+            /* ignore */
+        }
+        if (!data) {
+            const qs = window.location.search;
+            const params = parseQuery(qs);
+            if (params && Object.keys(params).length) {
+                data = {source: 'login_widget', params};
+            }
+        }
+        if (data) {
+            data['tz_name'] = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        }
+
+        return data;
+    }
+</script>

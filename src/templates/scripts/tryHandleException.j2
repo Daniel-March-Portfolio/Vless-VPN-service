@@ -1,0 +1,20 @@
+<script>
+    async function tryHandleException(response) {
+        try {
+            data = await response.json();
+            detail = data?.detail
+            if (detail) {
+                showAlert(
+                    typeof detail === 'string' ? detail : JSON.stringify(detail),
+                    () => {
+                        location.reload()
+                    }
+                );
+                return true;
+            }
+        } catch (e) {
+            alert(`Unhandled error: ${await response.status}`);
+            location.reload()
+        }
+    }
+</script>

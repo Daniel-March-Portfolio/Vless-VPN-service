@@ -1,0 +1,50 @@
+<div class="modal" id="newKeyModal">
+    <div class="modal_content">
+        <div class="section">
+            <small class="hint">TITLE</small>
+            <input id="newKeyModalTitle" class="input" aria-label="" value="New Key">
+        </div>
+        <div class="section">
+            <small class="hint">TARIFF</small>
+            <select id="newKeyModalTariff" class="input" aria-label="">
+                {% for tariff in tariffs %}
+                    <option value="{{ tariff.id }}">{{ tariff.title }} - {{ tariff.price }} ⭐ - {{ tariff.traffic_display }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="section">
+            <button class="button" onclick="createKey()">Create</button>
+            <button class="cancel_button" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+    <script>
+        async function createKey(){
+            const title = document.getElementById('newKeyModalTitle').value;
+            const tariffId = document.getElementById('newKeyModalTariff').value;
+
+            showLoading()
+            let response = await fetch(
+                `/api/keys/`,
+                {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        tariff: tariffId,
+                    })
+                }
+            )
+
+            if (!response.ok) {
+                hideLoading()
+                await tryHandleException(response)
+            } else {
+                location.reload()
+            }
+        }
+    </script>
+</div>

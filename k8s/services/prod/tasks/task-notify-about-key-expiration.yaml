@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: task-notify-about-key-expiration
+  namespace: vpn-prod
+  labels:
+    app: task-notify-about-key-expiration
+spec:
+  revisionHistoryLimit: 2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: task-notify-about-key-expiration
+  template:
+    metadata:
+      labels:
+        app: task-notify-about-key-expiration
+    spec:
+      containers:
+      - name: task-notify-about-key-expiration
+        image: ghcr.io/kelvpn/vpn4-prod:latest
+        args: [ "notify_about_key_expiration" , "600" ]
+        env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+        envFrom:
+          - secretRef:
+              name: app-secrets-prod
+      imagePullSecrets:
+        - name: github-registry-secret

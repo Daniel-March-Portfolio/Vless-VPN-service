@@ -1,0 +1,97 @@
+{% extends 'base.j2' %}
+{% block header %}
+    <header>
+        <div onclick="openURL('/balance/')">{{ "{:,.0f}".format(request.user.balance).replace(',',' ') }} ⭐</div>
+    </header>
+    <style>{% include 'switch-checkbox.css' %}</style>
+    <style>{% include 'tooltip.css' %}</style>
+{% endblock %}
+{% block body %}
+    <main>
+        <div id="main_content">
+
+            <div class="section_wrapper">
+                <div class="section">
+                    <div class="section_item accent_text">
+                        <span>🔑</span>
+                        <div>
+                            <div>
+                                <span class="text">{{ key.title }}</span>
+                            </div>
+                            <div>
+                                <small class="{{ 'destructive_text' if key.is_traffic_fully_used else 'hint' }}">{{ key.used_traffic_display }} / {{ key.tariff.traffic_display }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if key.is_traffic_fully_used %}
+                    <div class="section_footer">
+                        <small class="hint destructive_text">Key traffic overflow</small>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="section_wrapper">
+                <div class="section_header">
+                    <span class="hint">TARIFF</span>
+                </div>
+                <div class="section">
+                    <div class="section_item">
+                        <span>📃</span>
+                        <div class="items_between">
+                            <span class="text">{{ key.tariff.title }}</span>
+                            <span class="hint">{{ key.tariff.traffic_display }}</span>
+                        </div>
+                    </div>
+                    <div class="separator"></div>
+                    <div class="section_item accent_text" onclick="showModal('changeKeyTariffModal', () => prepareChangeKeyTariffModal('{{ key.tariff.id }}'))">
+                        <div class="section_item_action">
+                            {% include 'svg/edit.svg' %}
+                        </div>
+                        <label class="accent_text">Change tariff</label>
+                    </div>
+                </div>
+                <div class="section_footer">
+                    <small class="hint">Here you can change tariff on other</small>
+                </div>
+            </div>
+
+            <div class="section_wrapper">
+                <div class="section_header">
+                    <span class="hint">SETTINGS</span>
+                </div>
+                <div class="section">
+                    <div class="section_item accent_text">
+                        <span class="section_item_action" title="Enable or disable auto-renewal of the key">
+                            {% include 'svg/gear.svg' %}
+                        </span>
+                        <div class="items_between">
+                            <span class="text tooltip" data-tooltip="We will automatically renew the key at the end of the month so that you don't have to worry about it.">Auto renew</span>
+                            <div>
+                                <label class="switch">
+                                    <input id="{{ key.id }}-auto_renew"
+                                           type="checkbox"
+                                           {% if key.auto_renew %}checked{% endif %} onchange="setKeyBoolField('{{ key.id }}', 'auto_renew', !{{ key.auto_renew|tojson }})">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section_footer">
+                    <small class="hint">To learn more, click on the desired setting.</small>
+                </div>
+            </div>
+
+            <div class="section_wrapper">
+                <button id="copyKeyButton" class="section button" onclick="copyKeyToClipboard('{{ key.app_key }}')">Copy key</button>
+                <button class="section destructive_button" onclick="deleteKey('{{ key.id }}')">Delete key</button>
+                <button id="back-button" class="section cancel_button" onclick="location.href='/'">Go back</button>
+            </div>
+        </div>
+    </main>
+{% include 'key/changeKeyTariffModal.j2' %}
+{% endblock %}
+{% block scripts %}
+    {% include 'key/scripts.j2' %}
+{% endblock %}

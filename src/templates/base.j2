@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <script src="https://telegram.org/js/telegram-web-app.js?59"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style id="theme-dark">
+        {% include 'base_dark_theme_vars.css' %}
+    </style>
+    <style id="theme-light">
+        {% include 'base_light_theme_vars.css' %}
+    </style>
+    <style id="theme-header-general">
+        {% include 'header_general.css' %}
+    </style>
+    <style id="theme-header-fullscreen">
+        {% include 'header_fullscreen.css' %}
+    </style>
+    <style>
+        {% include 'base.css' %}
+    </style>
+    <title>Мой VPN</title>
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+    {% include 'scripts/showBackButton.j2' %}
+    {% block head %}{% endblock %}
+</head>
+<body class="fullscreen-body">
+{% block header %}
+    <header></header>
+{% endblock %}
+{% block body %}{% endblock %}
+<div id="loading_overflow"><span class="loader"></span></div>
+</body>
+<script>
+    function showLoading() {
+        document.getElementById('loading_overflow').style.display = 'flex'
+    }
+
+    function hideLoading() {
+        document.getElementById('loading_overflow').style.display = 'none'
+    }
+
+    hideLoading()
+</script>
+<script>
+    function showAlert(text, callback=null) {
+        if (window.Telegram.WebApp.isVersionAtLeast('6.2')) {
+            window.Telegram.WebApp.showAlert(text);
+        } else {
+            alert(text);
+        }
+        if (callback) {
+            callback()
+        }
+    }
+    function showConfirm(text, callback) {
+        if (window.Telegram.WebApp.isVersionAtLeast('6.2')) {
+            window.Telegram.WebApp.showConfirm(text, callback);
+        } else {
+            confirm(text) ? callback(true) : callback(false);
+        }
+    }
+    function closeApp() {
+        window.Telegram.WebApp.close();
+    }
+</script>
+<script>
+    function closeModal() {
+        for (const modal of document.getElementsByClassName('modal')) {
+            modal.style.display = 'none';
+        }
+    }
+    function showModal(name, prepare=null){
+        const modal = document.getElementById(name);
+        if (modal) {
+            if (prepare) {
+                prepare(modal)
+            }
+            modal.style.display = 'block';
+        }
+    }
+</script>
+<script>
+    function setTheme() {
+        const dark = document.getElementById("theme-dark");
+        const light = document.getElementById("theme-light");
+        const headerFullscreen = document.getElementById("theme-header-fullscreen");
+        const headerGeneral = document.getElementById("theme-header-general");
+
+        if (window.Telegram.WebApp.colorScheme === "dark") {
+            dark.disabled = false;
+            light.disabled = true;
+        } else {
+            dark.disabled = true;
+            light.disabled = false;
+        }
+        if (window.Telegram.WebApp.isFullscreen) {
+            headerFullscreen.disabled = false;
+            headerGeneral.disabled = true;
+        } else {
+            headerFullscreen.disabled = true;
+            headerGeneral.disabled = false;
+        }
+    }
+</script>
+<script>
+    window.Telegram.WebApp.expand()
+    if (window.Telegram.WebApp.isVersionAtLeast('8.0')) {
+        if (['tdesktop', 'weba'].indexOf(window.Telegram.WebApp.platform) == -1) {
+            window.Telegram.WebApp.requestFullscreen()
+        }
+        window.Telegram.WebApp.lockOrientation()
+    }
+    if (window.Telegram.WebApp.isVersionAtLeast('7.7')) {
+        window.Telegram.WebApp.disableVerticalSwipes()
+    }
+    if (window.Telegram.WebApp.isVersionAtLeast('6.1')) {
+        window.Telegram.WebApp.BackButton.onClick(() => {
+                showLoading()
+                openURL('/')
+            }
+        )
+        hideBackButton()
+    }
+    Telegram.WebApp.onEvent('themeChanged', setTheme);
+    Telegram.WebApp.onEvent('fullscreenChanged', setTheme);
+    setTheme()
+</script>
+<script>
+    function openURL(url) {
+        showLoading()
+        location.href = url;
+    }
+
+    function toLocalISOStringWithTZ(date) {
+        const pad = (n) => n.toString().padStart(2, '0');
+
+        const year = date.getFullYear();
+        const month = pad(date.getMonth() + 1);
+        const day = pad(date.getDate());
+        const hours = pad(date.getHours());
+        const minutes = pad(date.getMinutes());
+        const seconds = pad(date.getSeconds());
+        const ms = date.getMilliseconds().toString().padStart(3, '0');
+
+        const tzOffset = -date.getTimezoneOffset();
+        const tzSign = tzOffset >= 0 ? '+' : '-';
+        const tzHours = pad(Math.floor(Math.abs(tzOffset) / 60));
+        const tzMinutes = pad(Math.abs(tzOffset) % 60);
+
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${ms}${tzSign}${tzHours}:${tzMinutes}`;
+    }
+</script>
+{% block scripts %}{% endblock %}
+</html>

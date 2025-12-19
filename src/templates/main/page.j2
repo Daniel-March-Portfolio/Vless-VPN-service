@@ -1,0 +1,78 @@
+{% extends 'base.j2' %}
+{% block header %}
+    <header>
+        <div onclick="openURL('/balance/')">{{ "{:,.0f}".format(request.user.balance).replace(',',' ') }} ⭐</div>
+    </header>
+{% endblock %}
+{% block body %}
+    <main>
+        <div id="main_content">
+            <div class="section_wrapper">
+                <div class="section_header">
+                    <span class="hint">KEYS</span>
+                </div>
+                <div class="section">
+                    {% for key in request.user.keys.filter(is_active=True) %}
+                        <div class="section_item" onclick="openURL('/keys/{{ key.id }}/')">
+                            <span>🔑</span>
+                            <div>
+                                <div class="items_between">
+                                    <span class="text">{{ key.title }}</span>
+                                    <span class="text">{{ key.tariff.price }} ⭐</span>
+                                </div>
+                                <div class="items_between">
+                                    <small class="{{ 'destructive_text' if key.is_traffic_fully_used else 'hint' }}">{{ key.used_traffic_display }} / {{ key.tariff.traffic_display }}</small>
+                                    <small class="hint">{% if key.auto_renew %}Renew at{% else %}Until{% endif %} {{ key.end_date.strftime('%d.%m.%Y') }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="separator"></div>
+                    {% endfor %}
+                    <div class="section_item accent_text" onclick="showModal('newKeyModal')">
+                        <div class="section_item_action">
+                            {% include 'svg/add.svg' %}
+                        </div>
+                        <label class="accent_text">Create Key</label>
+                    </div>
+                </div>
+                <div class="section_footer">
+                    <small class="hint">You can create few keys, to share with friends or family</small>
+                </div>
+            </div>
+            {% set inactive_keys = request.user.keys.filter(is_active=False) %}
+            {% if inactive_keys %}
+                <div class="section_wrapper">
+                    <div class="section_header">
+                        <span class="hint">INACTIVE KEYS</span>
+                    </div>
+                    <div class="section">
+                        {% for key in inactive_keys %}
+                            <div class="section_item" onclick="showModal('activateKeyModal', () => prepareActivateKeyModal('{{ key.id }}','{{ key.title }}', '{{ key.tariff.title }} - {{ key.tariff.price }}⭐'))">
+                                <span>🔑</span>
+                                <div>
+                                    <div class="items_between">
+                                        <span class="text">{{ key.title }}</span>
+                                        <span class="text">{{ key.tariff.price }} ⭐</span>
+                                    </div>
+                                    <div class="items_between">
+                                        <small class="{{ 'destructive_text' if key.is_traffic_fully_used else 'hint' }}">{{ key.used_traffic_display }} / {{ key.tariff.traffic_display }}</small>
+                                        <small class="hint">{% if key.auto_renew %}Renew at{% else %}Untill{% endif %} {{ key.end_date.strftime('%d.%m.%Y') }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="separator"></div>
+                        {% endfor %}
+                    </div>
+                    <div class="section_footer">
+                        <small class="hint">This keys disabled, but you can pay to enable it or delete</small>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+    {% include 'main/newKeyModal.j2' %}
+    {% include 'main/refuelKeyModal.j2' %}
+{% endblock %}
+{% block scripts %}
+    {% include 'main/scripts.j2' %}
+{% endblock %}

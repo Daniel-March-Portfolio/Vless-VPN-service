@@ -1,0 +1,14 @@
+:root {
+  --html-background-color: #F0F0F0;
+  --header-background-color: #FFFFFF;
+  --text-color: #333333;
+  --hint-color: #A8A8A8;
+  --accent-color: #3D96E8;
+  --section-background-color: #FFFFFF;
+  --input-background-color: #F0F0F0;
+  --destructive-color: #CC2A28;
+  --success-color: #00C73E;
+  --separator-color: #E6E6E6;
+  --text-color-negative: white;
+  --loading-overflow-background-color: rgba(0, 0, 0, 0.35);
+}

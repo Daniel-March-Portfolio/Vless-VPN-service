@@ -1,0 +1,22 @@
+<script>
+    function showBackButton() {
+        if (window.Telegram.WebApp.isVersionAtLeast('6.1')) {
+            window.Telegram.WebApp.BackButton.show()
+        } else {
+            const backButton = document.getElementById('back-button');
+            if (backButton) {
+                backButton.style.display = 'block';
+            }
+        }
+    }
+
+    function hideBackButton() {
+        const backButton = document.getElementById('back-button');
+        if (backButton) {
+            backButton.style.display = 'none';
+        }
+        if (window.Telegram.WebApp.isVersionAtLeast('6.1')) {
+            window.Telegram.WebApp.BackButton.hide()
+        }
+    }
+</script>

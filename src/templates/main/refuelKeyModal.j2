@@ -1,0 +1,83 @@
+<div class="modal" id="activateKeyModal">
+    <div class="modal_content">
+        <div class="section">
+            <small class="hint">TITLE</small>
+            <input id="activateKeyModalTitle" class="input" aria-label="" readonly>
+        </div>
+        <div class="section">
+            <small class="hint">TARIFF</small>
+            <input id="activateKeyModalTariff" class="input" aria-label="" readonly>
+        </div>
+        <div class="section">
+            <button class="button" id="activateKeyModalPayButton">Оплатить</button>
+            <button class="destructive_button" id="activateKeyModalDeleteButton">Удалить</button>
+            <button class="cancel_button" onclick="closeModal()">Отмена</button>
+        </div>
+    </div>
+    <script>
+        async function deleteKey(key_id) {
+            showConfirm(
+                'Are you sure you want to delete this key?',
+                async (confirmed) => {
+                    if (confirmed) {
+                        showLoading()
+                        let response = await fetch(
+                            `/api/keys/${key_id}/`,
+                            {
+                                method: 'DELETE',
+                                credentials: 'include',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': getCookie('csrftoken')
+                                },
+                            }
+                        )
+                        if (!response.ok) {
+                            hideLoading()
+                            await tryHandleException(response)
+                        } else {
+                            openURL('/')
+                        }
+                    }
+                }
+            )
+        }
+        async function activateKey(key_id) {
+            showConfirm(
+                'Are you sure you want to activate and refuel this key?',
+                async (confirmed) => {
+                    if (confirmed) {
+                        showLoading()
+                        let response = await fetch(
+                            `/api/keys/${key_id}/refuel/`,
+                            {
+                                method: 'POST',
+                                credentials: 'include',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': getCookie('csrftoken')
+                                },
+                            }
+                        )
+                        if (!response.ok) {
+                            hideLoading()
+                            await tryHandleException(response)
+                        } else {
+                            location.reload()
+                        }
+                    }
+                }
+            )
+        }
+        function prepareActivateKeyModal(key, title, tariff){
+            document.getElementById('activateKeyModalTitle').value = title;
+            document.getElementById('activateKeyModalTariff').value = tariff;
+            document.getElementById('activateKeyModalPayButton').onclick = function() {
+                activateKey(key)
+            }
+            document.getElementById('activateKeyModalDeleteButton').onclick = function() {
+                deleteKey(key)
+            }
+        }
+    </script>
+</div>

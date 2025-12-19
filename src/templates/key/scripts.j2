@@ -1,0 +1,114 @@
+{% include 'scripts/tryHandleException.j2' %}
+<script>
+    showBackButton()
+</script>
+<script>
+    async function setKeyBoolField(key_id, field_name, value) {
+        showLoading()
+        let response = await fetch(
+            `/api/keys/${key_id}/`,
+            {
+                method: 'PATCH',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    [field_name]: value
+                })
+            }
+        )
+
+        hideLoading()
+        if (!response.ok) {
+            document.getElementById(`${key_id}-${field_name}`).checked = value
+            await tryHandleException(response)
+        } else {
+            document.getElementById(`${key_id}-${field_name}`).onchange = function() {
+                setKeyBoolField(key_id, field_name, !value)
+            }
+        }
+    }
+</script>
+<script>
+    async function setKeyField(key_id, field_name, value) {
+        showLoading()
+        let response = await fetch(
+            `/api/keys/${key_id}/`,
+            {
+                method: 'PATCH',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    [field_name]: value
+                })
+            }
+        )
+
+        if (!response.ok) {
+            hideLoading()
+            await tryHandleException(response)
+        } else {
+            location.reload()
+        }
+    }
+</script>
+
+<script>
+    async function deleteKey(key_id) {
+        showConfirm(
+            'Are you sure you want to delete this key?',
+            async (confirmed) => {
+                if (confirmed) {
+                    showLoading()
+                    let response = await fetch(
+                        `/api/keys/${key_id}/`,
+                        {
+                            method: 'DELETE',
+                            credentials: 'include',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                        }
+                    )
+                    if (!response.ok) {
+                        hideLoading()
+                        await tryHandleException(response)
+                    } else {
+                        openURL('/')
+                    }
+                }
+            }
+        )
+    }
+</script>
+
+<script>
+    async function copyKeyToClipboard(key) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(key)
+            showAlert('Key copied to clipboard');
+        } else {
+            const textarea = document.createElement("textarea");
+            textarea.value = key;
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            textarea.style.display = "none";
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                document.getElementById('copyKeyButton').outerHTML = `<textarea readonly onclick="this.select()" class="text-area" rows=7 style="resize: none">${key}</textarea>`;
+            }
+            document.body.removeChild(textarea);
+            return Promise.resolve();
+        }
+    }
+</script>

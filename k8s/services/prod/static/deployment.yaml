@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: static
+  namespace: vpn-prod
+  labels:
+    app: static
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: static
+  template:
+    metadata:
+      labels:
+        app: static
+    spec:
+      volumes:
+        - name: static-volume
+          emptyDir: {}
+        - name: nginx-config
+          configMap:
+            name: static-config
+
+      initContainers:
+        - name: collect-static
+          image: ghcr.io/kelvpn/vpn4-prod:latest
+          command: ["python", "manage.py", "collectstatic", "--noinput"]
+          volumeMounts:
+            - name: static-volume
+              mountPath: /app/static
+          envFrom:
+            - secretRef:
+                name: app-secrets-prod
+
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: static-volume
+              mountPath: /static
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+      imagePullSecrets:
+        - name: github-registry-secret

@@ -1,0 +1,69 @@
+{% extends 'base.j2' %}
+{% block body %}
+    <main>
+        <div id="main_content">
+            <div class="section_wrapper">
+                <div class="hint section_header">AUTHORIZATION</div>
+                <div class="section">
+                    <div class="section_item">
+                        <div id="open_edit_task_modal" class="section_item_action">
+                            {% include 'svg/wait.svg' %}
+                        </div>
+                        <div><small id="status">Wait...</small></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}
+{% block scripts %}
+    {% include 'scripts/getInitData.j2' %}
+    <script>
+        function parseQuery(qs) {
+            const params = {};
+            if (!qs) return params;
+            qs.replace(/^\?/, '').split('&').forEach(pair => {
+                if (!pair) return;
+                const [k, v] = pair.split('=');
+                params[decodeURIComponent(k)] = decodeURIComponent(v || '');
+            });
+            return params;
+        }
+
+        async function sendToServer(payload) {
+            const status = document.getElementById('status');
+            status.textContent = 'Sending data to server...';
+            try {
+                const res = await fetch('/api/users/login_telegram/', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken') || '{{ csrftoken }}'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) {
+                    const txt = await res.text();
+                    status.textContent = 'Failed: ' + txt;
+                    return;
+                }
+                openURL('{{ next_url }}');
+
+            } catch (err) {
+                status.textContent = 'Network error: ' + err.message;
+            }
+        }
+
+        (function init() {
+            const data = getInitData();
+            if (!data) {
+                document.getElementById('status').textContent = 'No init data found. Open app from Telegram.';
+                return;
+            }
+
+            sendToServer(data);
+        })();
+    </script>
+{% endblock %}
